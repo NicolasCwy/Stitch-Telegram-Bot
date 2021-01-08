@@ -67,29 +67,23 @@ def removeBG(file):
     # merge with mask got on one of a previous steps
     img_a = cv2.merge((c_red, c_green, c_blue, mask.astype('float32') / 255.0))
 
-    # save to disk
-    cv2.imwrite('out.png', img_a * 255)
-
     # Get path of output file
-    path = file.split('/')
-    path.pop(-1)
-    path = '/' + '/'.join(path) + '/' + 'out.png'
+    path = 'img/' + 'out.png'
 
-    print(path)
+    # save to disk
+    cv2.imwrite(path, img_a * 255)
 
     return path
 
 
-def resize(file):
+def resize(file, origName):
     img = PIL.Image.open(file)
     img = img.resize((512, 512))
-    img.save('r_img.png')
+    img.save('img/r_' + origName.split('.')[0].split('/')[1] + '.png')
     return img
 
 
 def processImg(file):
     path = removeBG(file)
-    stickerImg = resize(path)
+    stickerImg = resize(path, file)
     return stickerImg
-
-processImg(file)
