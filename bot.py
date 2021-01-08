@@ -3,7 +3,7 @@ import os
 import sys
 import json
 
-from telegram.ext import Updater, CommandHandler, CallbackQueryHandler
+from telegram.ext import Updater, CommandHandler, CallbackQueryHandler, ConversationHandler, MessageHandler, Filters
 import telegram
 
 InlineKeyboardButton = telegram.InlineKeyboardButton
@@ -38,8 +38,10 @@ else:
 with open('commands.json') as f:
   data = json.load(f)
 
+# Conversational states
+CHOOSING, NAMING = range(2)
 
-def start_handler(update, context):
+def start(update, context):
     # Creating a handler-function for /start command
     chat_id = update.message.chat_id
     logger.info("User {} started bot".format(chat_id))
@@ -52,6 +54,9 @@ def start_handler(update, context):
     reply_markup = telegram.InlineKeyboardMarkup.from_column(keyboard)
     update.message.reply_text("hello world \nClick /help for a list of commands", reply_markup=reply_markup)
 
+    # Change to state to wait for user sticker pack choice
+    return CHOOSING
+
 def help_handler(update, context):
     # Create a handler-function /help command
     commands = data['Commands'].keys()
@@ -59,15 +64,25 @@ def help_handler(update, context):
     for i in commands:
         # Uncapitalise JSON keys to be outputted
         text += "/{}\n".format(i.lower())
-    update.message.reply_text("These are the commands supported by the bot\n{}".format(text))
+    update.message.edit_text("These are the commands supported by the bot\n{}".format(text))
 
+def new_sticker_pack(update, context):
+    update.message.reply_text("What would you like to name it?")
+
+    return NAMING
+
+def done(update, context):
+    update.message.reply_text("I am done!")
+    return ConversationHandler.END
+
+# phasing out
 def button(update, context):
     query = update.callback_query
     # CallbackQueries need to be answered, even if no notification to the user is needed
     query.answer()
 
     if query.data == 'new':
-        query.message.reply_text('New sticker pack')
+        query.message.reply_text('Show sticker packs')
     elif query.data == 'show':
         query.message.reply_text('Show sticker packs')
     elif query.data == 'edit':
@@ -82,8 +97,17 @@ if __name__ == '__main__':
 
     dispatcher = updater.dispatcher
 
-    dispatcher.add_handler(CommandHandler("start", start_handler))
-    dispatcher.add_handler(CommandHandler("help", help_handler))
-    updater.dispatcher.add_handler(CallbackQueryHandler(button))
+    conv_handler = ConversationHandler(
+        # User can start using /start or /help
+        entry_points=[CommandHandler('start', start), CommandHandler("help", help_handler)],
+        states={
+            CHOOSING: [
+                CallbackQueryHandler(callback=new_sticker_pack)],
+        },
+        fallbacks=[MessageHandler(Filters.regex('^Done$'), done)],
+    )
+
+    dispatcher.add_handler(conv_handler)
+    # updater.dispatcher.add_handler(CallbackQueryHandler(button))
 
     run(updater)
