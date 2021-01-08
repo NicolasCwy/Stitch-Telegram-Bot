@@ -10,10 +10,10 @@
         "Text": "What would you like to name it?\n"
     },
     "nameError": {
-      "Text": "Name is not valid. Give Stitch another name!\n"
+      "Text": "Name not valid. Name needs to have 1 - 64 characters. Give Stitch another name!\n"
     },
     "nameConfirmation": {
-      "Text": "Stitched named it {}.\n"
+      "Text": "Stitched named it "
     },
     "newPackAddSticker": {
       "Text": "Feed Stitch pictures for stickers!\n"
@@ -31,7 +31,7 @@
       "Text": "Stitch happy! Stitch now need an emoji for the sticker.\n"
     },
     "nextSticker": {
-      "Text": "Okay, feed Stitch another picture!\n"
+      "Text": "Okay, feed Stitch another picture, or /publish to stop!\n"
     },
     "finalizePack": {
       "Text": "No more pictures for Stitch?\n"
