@@ -43,7 +43,14 @@ def start_handler(update, context):
     # Creating a handler-function for /start command
     chat_id = update.message.chat_id
     logger.info("User {} started bot".format(chat_id))
-    update.message.reply_text("hello world \nClick /help for a list of commands")
+    # Options to interact with sticker packs that user created through Stitch
+    keyboard = [InlineKeyboardButton(text='New sticker pack', callback_data='new'),
+                InlineKeyboardButton(text='Show sticker packs', callback_data='show'),
+                InlineKeyboardButton(text='Edit sticker pack', callback_data='edit'),
+                InlineKeyboardButton(text='Delete Sticker pack', callback_data='delete')]
+    # Format inline keyboard options into a column
+    reply_markup = telegram.InlineKeyboardMarkup.from_column(keyboard)
+    update.message.reply_text("hello world \nClick /help for a list of commands", reply_markup=reply_markup)
 
 def help_handler(update, context):
     # Create a handler-function /help command
@@ -52,12 +59,7 @@ def help_handler(update, context):
     for i in commands:
         # Uncapitalise JSON keys to be outputted
         text += "/{}\n".format(i.lower())
-    keyboard = [[InlineKeyboardButton(text='Testing1', callback_data='1'),
-                 InlineKeyboardButton(text='Testing2', callback_data='2'),
-                 InlineKeyboardButton(text='Testing3', callback_data='3'),
-                 InlineKeyboardButton(text='Testing3', callback_data='4')]]
-    reply_markup= telegram.InlineKeyboardMarkup(keyboard)
-    update.message.reply_text("These are the commands supported by the bot", reply_markup=reply_markup)
+    update.message.reply_text("These are the commands supported by the bot\n{}".format(text))
 
 
 if __name__ == '__main__':
