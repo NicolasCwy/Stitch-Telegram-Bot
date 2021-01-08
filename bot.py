@@ -94,7 +94,7 @@ def check_user_input(update, context):
         update.message.reply_text("Give me the name of your sticker pack")
         return ENTER_NAME
     elif "Image" in user_input:
-        update.message.reply_text("send me an image")
+        update.message.reply_text("Send me an image. /skip to cancel")
         return AWAIT_IMAGE
     else:
         # ask again
