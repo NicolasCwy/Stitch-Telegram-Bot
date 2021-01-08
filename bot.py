@@ -45,7 +45,6 @@ else:
 with open('commands.json') as f:
     data = json.load(f)
 
-
 def start_handler(update, context):
     reply_keyboard = [['Name'],['Image'],['Cancel']]
     markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
@@ -54,12 +53,14 @@ def start_handler(update, context):
     chat_id = update.message.chat_id
     logger.info("User {} started bot".format(chat_id))
 
-    # Setup keyboard and reply
-    update.message.reply_text(
-            ("Hey {}, how can i help you?".format(
-            update.message.chat['first_name'])),
-            reply_markup=markup)
-
+    # Options to interact with sticker packs that user created through Stitch
+    keyboard = [InlineKeyboardButton(text='New sticker pack', callback_data='new'),
+                InlineKeyboardButton(text='Show sticker packs', callback_data='show'),
+                InlineKeyboardButton(text='Edit sticker pack', callback_data='edit'),
+                InlineKeyboardButton(text='Delete Sticker pack', callback_data='delete')]
+    # Format inline keyboard options into a column
+    reply_markup = telegram.InlineKeyboardMarkup.from_column(keyboard)
+    update.message.reply_text(data['Commands']['Start']['Text'], reply_markup=reply_markup)
     return ENTRY
 
 def help_handler(update, context):
@@ -69,12 +70,12 @@ def help_handler(update, context):
     for i in commands:
         # Uncapitalise JSON keys to be outputted
         text += "/{}\n".format(i.lower())
-    update.message.reply_text("These are the commands supported by the bot\n{}".format(text))
+    update.message.reply_text(data['Commands']['Help']['Text'] + "{}".format(text))
+
 
 def image_handler(update, context):
     file = update.message.photo[-1].get_file()
     file.download('img/{}.jpg'.format(file.file_unique_id))
-
     processImg('img/{}.jpg'.format(file.file_unique_id))
 
     stickerImg = open("img/r_{}.png".format(file.file_unique_id), 'rb')
@@ -120,7 +121,8 @@ def publish_handler(update, context):
     update.message.reply_text("There you go! Stitch make stickers for you! \n https://t.me/addstickers/{}".format(context.user_data['sticker-set-name']))
 
 def cancel(update, context):
-    update.message.reply_text("Cancelled!")
+    update.message.reply_text(data['Commands']['cancel']['Text'])
+    return ENTRY
 
 def check_user_input(update, context):
     user_input = update.message.text
@@ -133,7 +135,7 @@ def check_user_input(update, context):
         reply_keyboard = [['Create'],['Cancel']]
         markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
         update.message.reply_text(
-            ("{}?!, i dont know anything... Let me know what you want me to do".format(
+            ("{}?!" + data['Commands']['askAgain']['Text']".format(
             user_input)),
             reply_markup=markup)
         return ENTRY
