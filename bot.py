@@ -54,7 +54,8 @@ def help_handler(update, context):
     commands = data['commands'].keys()
     text = ""
     for i in commands:
-        text += "/{}\n".format(i)
+        # Uncapitalise JSON keys to be outputted
+        text += "/{}\n".format(i.lower())
     update.message.reply_text("These are the commands supported by the bot\n{}".format(text))
 
 if __name__ == '__main__':
