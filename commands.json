@@ -1,0 +1,10 @@
+{
+  "Commands": {
+    "Start": {
+      "Text": "This is the start command"
+    },
+    "Sandom": {
+      "Text": "This is the random command"
+    }
+  }
+}
