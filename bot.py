@@ -54,7 +54,7 @@ def start_handler(update, context):
 
 def help_handler(update, context):
     # Create a handler-function /help command
-    commands = data['Cogmmands'].keys()
+    commands = data['Commands'].keys()
     text = ""
     for i in commands:
         # Uncapitalise JSON keys to be outputted
