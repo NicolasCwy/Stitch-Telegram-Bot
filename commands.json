@@ -2,7 +2,7 @@
   "Commands": {
     "Start": {
       "Text": "This is the start command"
-    }
+    },
     "Help": {
       "Text": "This is the help command"
     }

@@ -40,7 +40,7 @@ def start_handler(update, context):
     # Creating a handler-function for /start command
     chat_id = update.message.chat_id
     logger.info("User {} started bot".format(chat_id))
-    update.message.reply_text("hello world \n click /random for a random number")
+    update.message.reply_text("hello world \nClick /help for a list of commands")
 
 def help_handler(update, context):
     # Create a handler-function /help command
