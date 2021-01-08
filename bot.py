@@ -72,7 +72,7 @@ def image_handler(update, context):
     try:
         processImg('img/{}.jpg'.format(file.file_unique_id))
     except Exception:
-        update.message.reply_text("Sorry, something happened to Stitch... We need better developers..!")
+        update.message.reply_text(data['Commands']['photoError']['Text'])
         return ENTRY
 
     stickerImg = open("img/r_{}.png".format(file.file_unique_id), 'rb')
