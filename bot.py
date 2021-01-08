@@ -74,6 +74,14 @@ def image_handler(update, context):
     file.download('photo.jpg')
     logger.info('user image {}'.format(file))
     update.message.reply_text("recvd image")
+
+    print(context.args)
+    pack_name = str(update.message.text)
+    user_id = update.message.from_user.id
+    user_name = str(update.message.from_user.username)
+    context.bot.createNewStickerSet(user_id, f"{pack_name.replace(' ', '_')}_by_{user_name.replace(' ', '_')}",
+                                    pack_name,
+                                    "😍", file['file_id'])
     return AWAIT_IMAGE
 
 def name_handler(update, context):
@@ -84,15 +92,15 @@ def name_handler(update, context):
     update.message.reply_text("Send me one photo!")
     return AWAIT_IMAGE
 
-def create_sticker_pack(update, context):
-    logger.info("I'm at CREATE_PACK")
-    user_id = update.message.from_user.id
-    user_name = update.message.from_user.username
-    print(context.chat_data)
-    logger.info("Printed context")
-    # print(bot.get_updates(limit=10))
-    # context.bot.createNewStickerSet(user_id,f"{pack_name.replace(' ', '_')}_by_{user_name.replace(' ', '_')}", pack_name, "😍")
-    return ENTRY
+# def create_sticker_pack(update, context):
+#     logger.info("I'm at CREATE_PACK")
+#     pack_name = "family pack"
+#
+#     print(context.chat_data)
+#     logger.info("Printed context")
+#     # print(bot.get_updates(limit=10))
+#
+#     return ENTRY
 
 def skip_photo(update, context):
     update.message.reply_text("Alright! I respect that")
@@ -134,7 +142,6 @@ if __name__ == '__main__':
             ENTER_NAME: [MessageHandler(Filters.text,
                             name_handler, pass_chat_data=True)],
             AWAIT_IMAGE: [MessageHandler(Filters.photo, image_handler)],
-            CREATE_PACK: [create_sticker_pack],
         },
         fallbacks=[CommandHandler('cancel', cancel)]
     )
