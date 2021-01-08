@@ -7,6 +7,8 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, Conve
 import telegram
 from telegram import ReplyKeyboardMarkup
 
+from processImg import processImg
+
 InlineKeyboardButton = telegram.InlineKeyboardButton
 ENTRY, AWAIT_IMAGE, ENTER_NAME = range(3)
 
@@ -70,11 +72,12 @@ def help_handler(update, context):
 def image_handler(update, context):
     logger.info("recvd something")
     file = update.message.photo[-1].get_file()
-    file.download('photo.jpg')
+    file.download('img/{}.jpg'.format(file.file_unique_id))
     logger.info('user image {}'.format(file))
     update.message.reply_text("Thanks for sending me an image! Here's one in return!")
     #TODO send image to algorithm
-    update.message.reply_photo(open("example_images/cat_1.jpg", 'rb'))
+    processImg('img/{}.jpg'.format(file.file_unique_id))
+    update.message.reply_photo(open("img/r_{}.png".format(file.file_unique_id), 'rb'))
 
 def name_handler(update, context):
     #TODO: verify name and send to API
