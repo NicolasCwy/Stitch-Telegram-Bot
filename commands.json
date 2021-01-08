@@ -4,7 +4,7 @@
       "Text": "Aloha! My name Stitch. What are we doing today?\n"
     },
     "Help": {
-      "Text": "Aloha! My name Stitch, I am a bot who can help you make your telegram stickers easily!\n"
+      "Text": "Aloha! My name Stitch, I am a bot who can help you make your telegram stickers easily!\nUse the commands below to start:\n"
     },
     "namePack": {
         "Text": "What would you like to name it?\n"
@@ -56,6 +56,15 @@
     },
     "nextAction": {
       "Text": "Anything else for Stitch?\n"
+    },
+    "cancel": {
+      "Text" : "Stitch stop whatever? Okay. Stitch stop whatever.\n"
+    },
+    "skip": {
+      "Text": "Stitch go next? Okay. Stitch go next.\n"
+    },
+    "askAgain": {
+      "Text": "Stitch no understand? Try again.\n"
     }
   }
 }
