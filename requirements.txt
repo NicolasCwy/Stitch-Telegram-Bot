@@ -1,0 +1,2 @@
+###### Requirements without Version Specifiers ######`
+python-telegram-bot
