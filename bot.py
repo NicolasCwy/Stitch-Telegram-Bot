@@ -72,7 +72,9 @@ def image_handler(update, context):
     file = update.message.photo[-1].get_file()
     file.download('photo.jpg')
     logger.info('user image {}'.format(file))
-    update.message.reply_text("recvd image")
+    update.message.reply_text("Thanks for sending me an image! Here's one in return!")
+    #TODO send image to algorithm
+    update.message.reply_photo(open("example_images/cat_1.jpg", 'rb'))
 
 def name_handler(update, context):
     #TODO: verify name and send to API

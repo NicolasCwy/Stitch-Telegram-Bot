@@ -4,6 +4,10 @@ import PIL
 import sys
 from PIL import Image
 
+file = '' # TYPE IN FILENAME HERE
+
+# Open sourced kindly from user jedwards
+# https://stackoverflow.com/questions/29313667/how-do-i-remove-the-background-from-this-kind-of-image
 
 
 # == Parameters =======================================================================
@@ -68,6 +72,7 @@ def removeBG(file):
     # save to disk
     cv2.imwrite('out.png', img_a * 255)
 
+
     # Get path of output file.
     # Assume cropped file is in current directory
     path = './' + 'out.png'
@@ -88,5 +93,3 @@ def processImg(file):
 
 file = sys.argv[1]
 processImg(file)
-
-
