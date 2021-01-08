@@ -4,6 +4,9 @@ import sys
 import json
 
 from telegram.ext import Updater, CommandHandler
+import telegram
+
+InlineKeyboardButton = telegram.InlineKeyboardButton
 
 # Enabling logging
 logging.basicConfig(level=logging.INFO,
@@ -35,11 +38,15 @@ else:
 with open('commands.json') as f:
   data = json.load(f)
 
+
 def start_handler(update, context):
     # Creating a handler-function for /start command
     chat_id = update.message.chat_id
     logger.info("User {} started bot".format(chat_id))
     update.message.reply_text("hello world \nClick /help for a list of commands")
+
+def random(update, context):
+    update.message.reply_text("hello from the random function")
 
 def help_handler(update, context):
     # Create a handler-function /help command
@@ -48,7 +55,13 @@ def help_handler(update, context):
     for i in commands:
         # Uncapitalise JSON keys to be outputted
         text += "/{}\n".format(i.lower())
-    update.message.reply_text("These are the commands supported by the bot\n{}".format(text))
+    keyboard = [[InlineKeyboardButton(text='Testing1', callback_data='1'),
+                 InlineKeyboardButton(text='Testing2', callback_data='2'),
+                 InlineKeyboardButton(text='Testing3', callback_data='3'),
+                 InlineKeyboardButton(text='Testing3', callback_data='4')]]
+    reply_markup= telegram.InlineKeyboardMarkup(keyboard)
+    update.message.reply_text("These are the commands supported by the bot", reply_markup=reply_markup)
+
 
 if __name__ == '__main__':
     logger.info("Starting bot")
