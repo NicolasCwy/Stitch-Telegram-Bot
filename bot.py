@@ -95,7 +95,7 @@ def image_handler(update, context):
         context.bot.createNewStickerSet(user_id=update.message.from_user.id, name=sticker_set_name,
             title=context.user_data['name'], emojis='😄', png_sticker=open("img/r_{}.png".format(file.file_unique_id), 'rb'))
     finally:
-        update.message.reply_text("Sticker was made! /publish to stop or send me another picture to continue.")
+        update.message.reply_text(data['Commands']['nextSticker']['Text'])
         return AWAIT_IMAGE
 
 
@@ -105,17 +105,18 @@ def validate_pack_name(name):
 def name_handler(update, context):
     pack_name = update.message.text
     logger.info("I'm at ENTER_NAME")
-    update.message.reply_text("Thanks! Your submitted name was {}".format(pack_name))
+    update.message.reply_text(data['Commands']['nameConfirmation']['Text'] + "{}".format(pack_name))
     context.user_data['name'] = pack_name
     if validate_pack_name(pack_name):
-        update.message.reply_text("That name is valid! Now please send me your image")
+        update.message.reply_text("Name is valid! " + data['Commands']['newPackAddSticker']['Text'])
         return AWAIT_IMAGE
     else:
-        update.message.reply_text("Sorry, invalid name. Please have 1-64 characters only. \nTry again!")
+        update.message.reply_text(data['Commands']['nameError']['Text'])
         return ENTER_NAME
 
 def publish_handler(update, context):
-    update.message.reply_text("There you go! Stitch make stickers for you! \n https://t.me/addstickers/{}".format(context.user_data['sticker-set-name']))
+    update.message.reply_text(data['Commands']['finalizePack']['Text'])
+    update.message.reply_text(data['Commands']['createPack']['Text'] + "\n https://t.me/addstickers/{}".format(context.user_data['sticker-set-name']))
 
 def cancel(update, context):
     update.message.reply_text(data['Commands']['cancel']['Text'])
@@ -125,14 +126,14 @@ def check_user_input(update, context):
     user_input = update.message.text
     logger.info("User input was {}".format(user_input))
     if "Create" in user_input:
-        update.message.reply_text("Give me the name of your sticker pack")
+        update.message.reply_text(data['Commands']['namePack']['Text'])
         return ENTER_NAME
     else:
         # ask again
         reply_keyboard = [['Create'],['Cancel']]
         markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
         update.message.reply_text(
-            ("{}?!".format(user_input) + data['Commands']['askAgain']['Text']),
+            ("{}?! ".format(user_input) + data['Commands']['askAgain']['Text']),
             reply_markup=markup)
         return ENTRY
 
