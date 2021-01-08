@@ -3,6 +3,7 @@ import numpy as np
 import PIL
 from PIL import Image
 
+file = '' # TYPE IN FILENAME HERE
 
 # == Parameters =======================================================================
 def removeBG(file):
@@ -71,6 +72,8 @@ def removeBG(file):
     path.pop(-1)
     path = '/' + '/'.join(path) + '/' + 'out.png'
 
+    print(path)
+
     return path
 
 
@@ -86,4 +89,4 @@ def processImg(file):
     stickerImg = resize(path)
     return stickerImg
 
-
+processImg(file)
