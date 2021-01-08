@@ -2,6 +2,7 @@ import logging
 import os
 import random
 import sys
+import json
 
 from telegram.ext import Updater, CommandHandler
 
@@ -31,6 +32,10 @@ else:
     sys.exit(1)
 
 
+# open JSON file containing bot commands
+with open('commands.json') as f:
+  data = json.load(f)
+
 def start_handler(update, context):
     # Creating a handler-function for /start command
     chat_id = update.message.chat_id
@@ -44,6 +49,13 @@ def random_handler(update, context):
     logger.info("User {} number {} ".format(chat_id, number))
     update.message.reply_text("Random number: {}".format(number))
 
+def help_handler(update, context):
+    # Create a handler-function /help command
+    commands = data['commands'].keys()
+    text = ""
+    for i in commands:
+        text += "/{}\n".format(i)
+    update.message.reply_text("These are the commands supported by the bot\n{}".format(text))
 
 if __name__ == '__main__':
     logger.info("Starting bot")
@@ -53,5 +65,6 @@ if __name__ == '__main__':
 
     dispatcher.add_handler(CommandHandler("start", start_handler))
     dispatcher.add_handler(CommandHandler("random", random_handler))
+    dispatcher.add_handler(CommandHandler("help", help_handler))
 
     run(updater)
