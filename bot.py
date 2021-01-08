@@ -118,7 +118,7 @@ if __name__ == '__main__':
             ENTRY: [MessageHandler(Filters.text,
                                    check_user_input)],
             ENTER_NAME: [MessageHandler(Filters.text,
-                            name_handler())],
+                            name_handler)],
             AWAIT_IMAGE: [MessageHandler(Filters.photo, image_handler), CommandHandler('skip', skip_photo)]
         },
         fallbacks=[CommandHandler('cancel', cancel)]
