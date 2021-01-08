@@ -6,6 +6,7 @@ import json
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler
 import telegram
 from telegram import ReplyKeyboardMarkup
+from telegram import bot
 
 InlineKeyboardButton = telegram.InlineKeyboardButton
 ENTRY, AWAIT_IMAGE, ENTER_NAME = range(3)
@@ -76,8 +77,12 @@ def image_handler(update, context):
 
 def name_handler(update, context):
     #TODO: verify name and send to API
+    user_id = update.message.from_user.id
+    user_name = update.message.from_user.username
+    pack_name = update.message.text
     logger.info("I'm at ENTER_NAME")
-    update.message.reply_text("Thanks! Your submitted name was {}".format(update.message.text))
+    update.message.reply_text("Thanks! Your submitted name was {}".format(pack_name))
+    context.bot.createNewStickerSet(user_id,f"{pack_name.replace(' ', '_')}_by_{user_name.replace(' ', '_')}", pack_name, "😍")
     return ENTRY
 
 def skip_photo(update, context):
