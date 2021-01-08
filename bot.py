@@ -40,7 +40,7 @@ else:
 
 
 # open JSON file containing bot commands
-with open('commands.json','r') as f:
+with open('commands.json') as f:
     data = json.load(f)
 
 def start_handler(update, context):
@@ -59,7 +59,6 @@ def start_handler(update, context):
     # Format inline keyboard options into a column
     reply_markup = telegram.InlineKeyboardMarkup.from_column(keyboard)
     update.message.reply_text(data['Commands']['Start']['Text'], reply_markup=reply_markup)
-
     return ENTRY
 
 def help_handler(update, context):
@@ -71,12 +70,14 @@ def help_handler(update, context):
         text += "/{}\n".format(i.lower())
     update.message.reply_text(data['Commands']['Help']['Text'] + "{}".format(text))
 
+
 def image_handler(update, context):
     logger.info("recvd something")
     file = update.message.photo[-1].get_file()
     file.download('img/{}.jpg'.format(file.file_unique_id))
     logger.info('user image {}'.format(file))
     update.message.reply_text(data['Commands']['nextSticker']['Text'])
+
     #TODO send image to algorithm
     processImg('img/{}.jpg'.format(file.file_unique_id))
     update.message.reply_photo(open("img/r_{}.png".format(file.file_unique_id), 'rb'))
@@ -93,6 +94,7 @@ def skip_photo(update, context):
 
 def cancel(update, context):
     update.message.reply_text(data['Commands']['cancel']['Text'])
+    return ENTRY
 
 def check_user_input(update, context):
     user_input = update.message.text
