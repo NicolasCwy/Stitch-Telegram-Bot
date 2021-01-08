@@ -3,13 +3,13 @@ import os
 import sys
 import json
 
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler, Handler
 import telegram
 from telegram import ReplyKeyboardMarkup
 from telegram import bot
 
 InlineKeyboardButton = telegram.InlineKeyboardButton
-ENTRY, AWAIT_IMAGE, ENTER_NAME = range(3)
+ENTRY, ENTER_NAME, AWAIT_IMAGE, CREATE_PACK = range(4)
 
 # Enabling logging
 logging.basicConfig(level=logging.INFO,
@@ -74,15 +74,24 @@ def image_handler(update, context):
     file.download('photo.jpg')
     logger.info('user image {}'.format(file))
     update.message.reply_text("recvd image")
+    return AWAIT_IMAGE
 
 def name_handler(update, context):
     #TODO: verify name and send to API
-    user_id = update.message.from_user.id
-    user_name = update.message.from_user.username
     pack_name = update.message.text
     logger.info("I'm at ENTER_NAME")
     update.message.reply_text("Thanks! Your submitted name was {}".format(pack_name))
-    context.bot.createNewStickerSet(user_id,f"{pack_name.replace(' ', '_')}_by_{user_name.replace(' ', '_')}", pack_name, "😍")
+    update.message.reply_text("Send me one photo!")
+    return AWAIT_IMAGE
+
+def create_sticker_pack(update, context):
+    logger.info("I'm at CREATE_PACK")
+    user_id = update.message.from_user.id
+    user_name = update.message.from_user.username
+    print(context.chat_data)
+    logger.info("Printed context")
+    # print(bot.get_updates(limit=10))
+    # context.bot.createNewStickerSet(user_id,f"{pack_name.replace(' ', '_')}_by_{user_name.replace(' ', '_')}", pack_name, "😍")
     return ENTRY
 
 def skip_photo(update, context):
@@ -123,8 +132,9 @@ if __name__ == '__main__':
             ENTRY: [MessageHandler(Filters.text,
                                    check_user_input)],
             ENTER_NAME: [MessageHandler(Filters.text,
-                            name_handler)],
-            AWAIT_IMAGE: [MessageHandler(Filters.photo, image_handler), CommandHandler('skip', skip_photo)]
+                            name_handler, pass_chat_data=True)],
+            AWAIT_IMAGE: [MessageHandler(Filters.photo, image_handler)],
+            CREATE_PACK: [create_sticker_pack],
         },
         fallbacks=[CommandHandler('cancel', cancel)]
     )
