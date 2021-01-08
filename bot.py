@@ -3,7 +3,7 @@ import os
 import sys
 import json
 
-from telegram.ext import Updater, CommandHandler
+from telegram.ext import Updater, CommandHandler, CallbackQueryHandler
 import telegram
 
 InlineKeyboardButton = telegram.InlineKeyboardButton
@@ -61,6 +61,20 @@ def help_handler(update, context):
         text += "/{}\n".format(i.lower())
     update.message.reply_text("These are the commands supported by the bot\n{}".format(text))
 
+def button(update, context):
+    query = update.callback_query
+    # CallbackQueries need to be answered, even if no notification to the user is needed
+    query.answer()
+
+    if query.data == 'new':
+        query.message.reply_text('New sticker pack')
+    elif query.data == 'show':
+        query.message.reply_text('Show sticker packs')
+    elif query.data == 'edit':
+        query.message.reply_text('Edit sticker pack')
+    elif query.data == 'delete':
+        query.message.reply_text('Delete Sticker pack')
+
 
 if __name__ == '__main__':
     logger.info("Starting bot")
@@ -70,5 +84,6 @@ if __name__ == '__main__':
 
     dispatcher.add_handler(CommandHandler("start", start_handler))
     dispatcher.add_handler(CommandHandler("help", help_handler))
+    updater.dispatcher.add_handler(CallbackQueryHandler(button))
 
     run(updater)
