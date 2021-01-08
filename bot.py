@@ -1,6 +1,5 @@
 import logging
 import os
-import random
 import sys
 import json
 
@@ -44,7 +43,7 @@ def start_handler(update, context):
 
 def help_handler(update, context):
     # Create a handler-function /help command
-    commands = data['Commands'].keys()
+    commands = data['Cogmmands'].keys()
     text = ""
     for i in commands:
         # Uncapitalise JSON keys to be outputted
