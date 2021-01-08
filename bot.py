@@ -42,13 +42,6 @@ def start_handler(update, context):
     logger.info("User {} started bot".format(chat_id))
     update.message.reply_text("hello world \n click /random for a random number")
 
-def random_handler(update, context):
-    # Creating a handler-function for /random command
-    number = random.randint(0, 10)
-    chat_id = update.message.chat_id
-    logger.info("User {} number {} ".format(chat_id, number))
-    update.message.reply_text("Random number: {}".format(number))
-
 def help_handler(update, context):
     # Create a handler-function /help command
     commands = data['commands'].keys()
@@ -64,7 +57,6 @@ if __name__ == '__main__':
     dispatcher = updater.dispatcher
 
     dispatcher.add_handler(CommandHandler("start", start_handler))
-    dispatcher.add_handler(CommandHandler("random", random_handler))
     dispatcher.add_handler(CommandHandler("help", help_handler))
 
     run(updater)

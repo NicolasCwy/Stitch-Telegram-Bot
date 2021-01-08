@@ -2,10 +2,7 @@
   "Commands": {
     "Start": {
       "Text": "This is the start command"
-    },
-    "Sandom": {
-      "Text": "This is the random command"
-    },
+    }
     "Help": {
       "Text": "This is the help command"
     }
