@@ -45,9 +45,6 @@ def start_handler(update, context):
     logger.info("User {} started bot".format(chat_id))
     update.message.reply_text("hello world \nClick /help for a list of commands")
 
-def random(update, context):
-    update.message.reply_text("hello from the random function")
-
 def help_handler(update, context):
     # Create a handler-function /help command
     commands = data['Cogmmands'].keys()
