@@ -4,7 +4,7 @@ import random
 import sys
 import json
 
-from telegram.ext import Updater, CommandHandler
+from telegram.ext import Updater, CommandHandler, CallbackQueryHandler
 import telegram
 
 InlineKeyboardButton = telegram.InlineKeyboardButton
@@ -53,9 +53,6 @@ def start_handler(update, context):
     reply_markup = telegram.InlineKeyboardMarkup.from_column(keyboard)
     update.message.reply_text("hello world \nClick /help for a list of commands", reply_markup=reply_markup)
 
-def random(update, context):
-    update.message.reply_text("hello from the random function")
-
 def help_handler(update, context):
     # Create a handler-function /help command
     commands = data['Commands'].keys()
@@ -64,6 +61,20 @@ def help_handler(update, context):
         # Uncapitalise JSON keys to be outputted
         text += "/{}\n".format(i.lower())
     update.message.reply_text("These are the commands supported by the bot\n{}".format(text))
+
+def button(update, context):
+    query = update.callback_query
+    # CallbackQueries need to be answered, even if no notification to the user is needed
+    query.answer()
+
+    if query.data == 'new':
+        query.message.reply_text('New sticker pack')
+    elif query.data == 'show':
+        query.message.reply_text('Show sticker packs')
+    elif query.data == 'edit':
+        query.message.reply_text('Edit sticker pack')
+    elif query.data == 'delete':
+        query.message.reply_text('Delete Sticker pack')
 
 
 if __name__ == '__main__':
@@ -74,5 +85,6 @@ if __name__ == '__main__':
 
     dispatcher.add_handler(CommandHandler("start", start_handler))
     dispatcher.add_handler(CommandHandler("help", help_handler))
+    updater.dispatcher.add_handler(CallbackQueryHandler(button))
 
     run(updater)
