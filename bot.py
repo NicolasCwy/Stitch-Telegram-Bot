@@ -3,10 +3,12 @@ import os
 import sys
 import json
 
-from telegram.ext import Updater, CommandHandler, CallbackQueryHandler
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler
 import telegram
+from telegram import ReplyKeyboardMarkup
 
 InlineKeyboardButton = telegram.InlineKeyboardButton
+ENTRY, AWAIT_IMAGE, ENTER_NAME = range(3)
 
 # Enabling logging
 logging.basicConfig(level=logging.INFO,
@@ -19,6 +21,7 @@ TOKEN = os.getenv("TOKEN")
 if mode == "dev":
     def run(updater):
         updater.start_polling()
+        updater.idle()
 elif mode == "prod":
     def run(updater):
         PORT = int(os.environ.get("PORT", "8443"))
@@ -36,21 +39,24 @@ else:
 
 # open JSON file containing bot commands
 with open('commands.json') as f:
-  data = json.load(f)
+    data = json.load(f)
 
 
 def start_handler(update, context):
-    # Creating a handler-function for /start command
+    reply_keyboard = [['Name'],['Image'],['Cancel']]
+    markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
+    logger.info("Started")
+
     chat_id = update.message.chat_id
     logger.info("User {} started bot".format(chat_id))
-    # Options to interact with sticker packs that user created through Stitch
-    keyboard = [InlineKeyboardButton(text='New sticker pack', callback_data='new'),
-                InlineKeyboardButton(text='Show sticker packs', callback_data='show'),
-                InlineKeyboardButton(text='Edit sticker pack', callback_data='edit'),
-                InlineKeyboardButton(text='Delete Sticker pack', callback_data='delete')]
-    # Format inline keyboard options into a column
-    reply_markup = telegram.InlineKeyboardMarkup.from_column(keyboard)
-    update.message.reply_text("hello world \nClick /help for a list of commands", reply_markup=reply_markup)
+
+    # Setup keyboard and reply
+    update.message.reply_text(
+            ("Hey {}, how can i help you?".format(
+            update.message.chat['first_name'])),
+            reply_markup=markup)
+
+    return ENTRY
 
 def help_handler(update, context):
     # Create a handler-function /help command
@@ -61,20 +67,44 @@ def help_handler(update, context):
         text += "/{}\n".format(i.lower())
     update.message.reply_text("These are the commands supported by the bot\n{}".format(text))
 
-def button(update, context):
-    query = update.callback_query
-    # CallbackQueries need to be answered, even if no notification to the user is needed
-    query.answer()
+def image_handler(update, context):
+    logger.info("recvd something")
+    file = update.message.photo[-1].get_file()
+    file.download('photo.jpg')
+    logger.info('user image {}'.format(file))
+    update.message.reply_text("recvd image")
 
-    if query.data == 'new':
-        query.message.reply_text('New sticker pack')
-    elif query.data == 'show':
-        query.message.reply_text('Show sticker packs')
-    elif query.data == 'edit':
-        query.message.reply_text('Edit sticker pack')
-    elif query.data == 'delete':
-        query.message.reply_text('Delete Sticker pack')
+def name_handler(update, context):
+    #TODO: verify name and send to API
+    logger.info("I'm at ENTER_NAME")
+    update.message.reply_text("Thanks! Your submitted name was {}".format(update.message.text))
+    return ENTRY
 
+def skip_photo(update, context):
+    update.message.reply_text("Alright! I respect that")
+    return ENTRY
+
+def cancel(update, context):
+    update.message.reply_text("Cancelled!")
+
+def check_user_input(update, context):
+    user_input = update.message.text
+    logger.info("User input was {}".format(user_input))
+    if "Name" in user_input:
+        update.message.reply_text("Give me the name of your sticker pack")
+        return ENTER_NAME
+    elif "Image" in user_input:
+        update.message.reply_text("send me an image")
+        return AWAIT_IMAGE
+    else:
+        # ask again
+        reply_keyboard = [['Name'],['Image'],['Cancel']]
+        markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
+        update.message.reply_text(
+            ("{}?!, i dont know anything... Let me know what you want me to do".format(
+            user_input)),
+            reply_markup=markup)
+        return ENTRY
 
 if __name__ == '__main__':
     logger.info("Starting bot")
@@ -82,8 +112,18 @@ if __name__ == '__main__':
 
     dispatcher = updater.dispatcher
 
-    dispatcher.add_handler(CommandHandler("start", start_handler))
+    conv_handler = ConversationHandler(
+        entry_points=[CommandHandler('start', start_handler)],
+        states={
+            ENTRY: [MessageHandler(Filters.text,
+                                   check_user_input)],
+            ENTER_NAME: [MessageHandler(Filters.text,
+                            name_handler)],
+            AWAIT_IMAGE: [MessageHandler(Filters.photo, image_handler), CommandHandler('skip', skip_photo)]
+        },
+        fallbacks=[CommandHandler('cancel', cancel)]
+    )
+    dispatcher.add_handler(conv_handler)
     dispatcher.add_handler(CommandHandler("help", help_handler))
-    updater.dispatcher.add_handler(CallbackQueryHandler(button))
 
     run(updater)
