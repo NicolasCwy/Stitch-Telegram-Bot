@@ -12,7 +12,7 @@ from telegram import ReplyKeyboardMarkup
 from processImg import processImg
 
 InlineKeyboardButton = telegram.InlineKeyboardButton
-ENTRY, ENTER_NAME, AWAIT_IMAGE, CREATE_PACK = range(4)
+ENTRY, ENTER_NAME, AWAIT_IMAGE = range(3)
 
 # Enabling logging
 logging.basicConfig(level=logging.INFO,
@@ -46,21 +46,14 @@ with open('commands.json') as f:
     data = json.load(f)
 
 def start_handler(update, context):
-    reply_keyboard = [['Name'],['Image'],['Cancel']]
+    reply_keyboard = [['Create'],['Cancel']]
     markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
     logger.info("Started")
 
     chat_id = update.message.chat_id
     logger.info("User {} started bot".format(chat_id))
 
-    # Options to interact with sticker packs that user created through Stitch
-    keyboard = [InlineKeyboardButton(text='New sticker pack', callback_data='new'),
-                InlineKeyboardButton(text='Show sticker packs', callback_data='show'),
-                InlineKeyboardButton(text='Edit sticker pack', callback_data='edit'),
-                InlineKeyboardButton(text='Delete Sticker pack', callback_data='delete')]
-    # Format inline keyboard options into a column
-    reply_markup = telegram.InlineKeyboardMarkup.from_column(keyboard)
-    update.message.reply_text(data['Commands']['Start']['Text'], reply_markup=reply_markup)
+    update.message.reply_text(data['Commands']['Start']['Text'], reply_markup=markup)
     return ENTRY
 
 def help_handler(update, context):
@@ -76,7 +69,11 @@ def help_handler(update, context):
 def image_handler(update, context):
     file = update.message.photo[-1].get_file()
     file.download('img/{}.jpg'.format(file.file_unique_id))
-    processImg('img/{}.jpg'.format(file.file_unique_id))
+    try:
+        processImg('img/{}.jpg'.format(file.file_unique_id))
+    except Exception:
+        update.message.reply_text("Sorry, something happened to Stitch... We need better developers..!")
+        return ENTRY
 
     stickerImg = open("img/r_{}.png".format(file.file_unique_id), 'rb')
     # show the user the cropped image
@@ -85,7 +82,7 @@ def image_handler(update, context):
     # create/add to sticker pack and return sticker
     username = update.message.from_user['username']
     hash = hashlib.sha1(bytearray(update.effective_user.id)).hexdigest()
-    sticker_set_name = 'Stitched_%s_by_stichers_bot' % hash[:20]
+    sticker_set_name = 'Stitched_%s_by_stichers_bot' % hash[:10]
 
     #TODO get emoji from user
 
@@ -103,7 +100,7 @@ def image_handler(update, context):
 
 
 def validate_pack_name(name):
-    return 5 < len(name) < 64 and bool(re.match('^[a-zA-Z0-9_]+$', name))
+    return 1 < len(name) < 64
 
 def name_handler(update, context):
     pack_name = update.message.text
@@ -114,7 +111,7 @@ def name_handler(update, context):
         update.message.reply_text("That name is valid! Now please send me your image")
         return AWAIT_IMAGE
     else:
-        update.message.reply_text("Sorry, invalid name. Please use alphanumeric characters and underscores only. \nTry again!")
+        update.message.reply_text("Sorry, invalid name. Please have 1-64 characters only. \nTry again!")
         return ENTER_NAME
 
 def publish_handler(update, context):
@@ -135,8 +132,7 @@ def check_user_input(update, context):
         reply_keyboard = [['Create'],['Cancel']]
         markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
         update.message.reply_text(
-            ("{}?!" + data['Commands']['askAgain']['Text']".format(
-            user_input)),
+            ("{}?!".format(user_input) + data['Commands']['askAgain']['Text']),
             reply_markup=markup)
         return ENTRY
 
