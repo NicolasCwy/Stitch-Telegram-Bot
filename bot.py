@@ -50,7 +50,7 @@ def start_handler(update, context):
                 InlineKeyboardButton(text='Delete Sticker pack', callback_data='delete')]
     # Format inline keyboard options into a column
     reply_markup = telegram.InlineKeyboardMarkup.from_column(keyboard)
-    update.message.reply_text("hello world \nClick /help for a list of commands", reply_markup=reply_markup)
+    update.message.reply_text(data['Commands']['Start']['Text'], reply_markup=reply_markup)
 
 def help_handler(update, context):
     # Create a handler-function /help command
@@ -59,7 +59,7 @@ def help_handler(update, context):
     for i in commands:
         # Uncapitalise JSON keys to be outputted
         text += "/{}\n".format(i.lower())
-    update.message.reply_text("These are the commands supported by the bot\n{}".format(text))
+    update.message.reply_text(data['Commands']['Start']['Text'] + "{}".format(text))
 
 def button(update, context):
     query = update.callback_query
