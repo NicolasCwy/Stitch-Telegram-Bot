@@ -5,6 +5,9 @@ from PIL import Image
 
 file = '' # TYPE IN FILENAME HERE
 
+# Open sourced kindly from user jedwards
+# https://stackoverflow.com/questions/29313667/how-do-i-remove-the-background-from-this-kind-of-image
+
 # == Parameters =======================================================================
 def removeBG(file):
     BLUR = 21
