@@ -44,10 +44,12 @@ def start_handler(update, context):
     # Creating a handler-function for /start command
     chat_id = update.message.chat_id
     logger.info("User {} started bot".format(chat_id))
-    keyboard = [InlineKeyboardButton(text='New sticker pack', callback_data='1'),
-                InlineKeyboardButton(text='Show sticker packs', callback_data='2'),
-                InlineKeyboardButton(text='Edit sticker pack', callback_data='3'),
-                InlineKeyboardButton(text='Delete Sticker pack', callback_data='4')]
+    # Options to interact with sticker packs that user created through Stitch
+    keyboard = [InlineKeyboardButton(text='New sticker pack', callback_data='new'),
+                InlineKeyboardButton(text='Show sticker packs', callback_data='show'),
+                InlineKeyboardButton(text='Edit sticker pack', callback_data='edit'),
+                InlineKeyboardButton(text='Delete Sticker pack', callback_data='delete')]
+    # Format inline keyboard options into a column
     reply_markup = telegram.InlineKeyboardMarkup.from_column(keyboard)
     update.message.reply_text("hello world \nClick /help for a list of commands", reply_markup=reply_markup)
 
