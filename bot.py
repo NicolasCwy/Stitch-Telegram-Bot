@@ -2,15 +2,17 @@ import logging
 import os
 import sys
 import json
+import re
+import hashlib
 
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler, Handler
 import telegram
 from telegram import ReplyKeyboardMarkup
 
 from processImg import processImg
 
 InlineKeyboardButton = telegram.InlineKeyboardButton
-ENTRY, AWAIT_IMAGE, ENTER_NAME = range(3)
+ENTRY, ENTER_NAME, AWAIT_IMAGE = range(3)
 
 # Enabling logging
 logging.basicConfig(level=logging.INFO,
@@ -44,21 +46,14 @@ with open('commands.json') as f:
     data = json.load(f)
 
 def start_handler(update, context):
-    reply_keyboard = [['Name'],['Image'],['Cancel']]
+    reply_keyboard = [['Create'],['Cancel']]
     markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
     logger.info("Started")
 
     chat_id = update.message.chat_id
     logger.info("User {} started bot".format(chat_id))
 
-    # Options to interact with sticker packs that user created through Stitch
-    keyboard = [InlineKeyboardButton(text='New sticker pack', callback_data='new'),
-                InlineKeyboardButton(text='Show sticker packs', callback_data='show'),
-                InlineKeyboardButton(text='Edit sticker pack', callback_data='edit'),
-                InlineKeyboardButton(text='Delete Sticker pack', callback_data='delete')]
-    # Format inline keyboard options into a column
-    reply_markup = telegram.InlineKeyboardMarkup.from_column(keyboard)
-    update.message.reply_text(data['Commands']['Start']['Text'], reply_markup=reply_markup)
+    update.message.reply_text(data['Commands']['Start']['Text'], reply_markup=markup)
     return ENTRY
 
 def help_handler(update, context):
@@ -72,25 +67,55 @@ def help_handler(update, context):
 
 
 def image_handler(update, context):
-    logger.info("recvd something")
     file = update.message.photo[-1].get_file()
     file.download('img/{}.jpg'.format(file.file_unique_id))
-    logger.info('user image {}'.format(file))
-    update.message.reply_text(data['Commands']['nextSticker']['Text'])
+    try:
+        processImg('img/{}.jpg'.format(file.file_unique_id))
+    except Exception:
+        update.message.reply_text("Sorry, something happened to Stitch... We need better developers..!")
+        return ENTRY
 
-    #TODO send image to algorithm
-    processImg('img/{}.jpg'.format(file.file_unique_id))
-    update.message.reply_photo(open("img/r_{}.png".format(file.file_unique_id), 'rb'))
+    stickerImg = open("img/r_{}.png".format(file.file_unique_id), 'rb')
+    # show the user the cropped image
+    # update.message.reply_photo(stickerImg)
+
+    # create/add to sticker pack and return sticker
+    username = update.message.from_user['username']
+    hash = hashlib.sha1(bytearray(update.effective_user.id)).hexdigest()
+    sticker_set_name = 'Stitched_%s_by_stichers_bot' % hash[:10]
+
+    #TODO get emoji from user
+
+    context.user_data['sticker-set-name'] = sticker_set_name
+    logging.info("creating sticker for: userid: {}, stickersetname: {}".format(update.message.from_user.id, sticker_set_name))
+    try:
+        context.bot.addStickerToSet(user_id=update.message.from_user.id, name=sticker_set_name, emojis='😄',
+                                    png_sticker=open("img/r_{}.png".format(file.file_unique_id), 'rb'))
+    except Exception:
+        context.bot.createNewStickerSet(user_id=update.message.from_user.id, name=sticker_set_name,
+            title=context.user_data['name'], emojis='😄', png_sticker=open("img/r_{}.png".format(file.file_unique_id), 'rb'))
+    finally:
+        update.message.reply_text("Sticker was made! /publish to stop or send me another picture to continue.")
+        return AWAIT_IMAGE
+
+
+def validate_pack_name(name):
+    return 1 < len(name) < 64
 
 def name_handler(update, context):
-    #TODO: verify name and send to API
+    pack_name = update.message.text
     logger.info("I'm at ENTER_NAME")
-    update.message.reply_text(data['Commands']['nameConfirmation']['Text'] + "{}".format(update.message.text))
-    return ENTRY
+    update.message.reply_text("Thanks! Your submitted name was {}".format(pack_name))
+    context.user_data['name'] = pack_name
+    if validate_pack_name(pack_name):
+        update.message.reply_text("That name is valid! Now please send me your image")
+        return AWAIT_IMAGE
+    else:
+        update.message.reply_text("Sorry, invalid name. Please have 1-64 characters only. \nTry again!")
+        return ENTER_NAME
 
-def skip_photo(update, context):
-    update.message.reply_text(data['Commands']['skip']['Text'])
-    return ENTRY
+def publish_handler(update, context):
+    update.message.reply_text("There you go! Stitch make stickers for you! \n https://t.me/addstickers/{}".format(context.user_data['sticker-set-name']))
 
 def cancel(update, context):
     update.message.reply_text(data['Commands']['cancel']['Text'])
@@ -99,19 +124,15 @@ def cancel(update, context):
 def check_user_input(update, context):
     user_input = update.message.text
     logger.info("User input was {}".format(user_input))
-    if "Name" in user_input:
-        update.message.reply_text(data['Commands']['namePack']['Text'])
+    if "Create" in user_input:
+        update.message.reply_text("Give me the name of your sticker pack")
         return ENTER_NAME
-    elif "Image" in user_input:
-        update.message.reply_text(data['Commands']['newPackAddSticker']['Text'])
-        return AWAIT_IMAGE
     else:
         # ask again
-        reply_keyboard = [['Name'],['Image'],['Cancel']]
+        reply_keyboard = [['Create'],['Cancel']]
         markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
         update.message.reply_text(
-            ("{}?!" + data['Commands']['askAgain']['Text']".format(
-            user_input)),
+            ("{}?!".format(user_input) + data['Commands']['askAgain']['Text']),
             reply_markup=markup)
         return ENTRY
 
@@ -127,8 +148,8 @@ if __name__ == '__main__':
             ENTRY: [MessageHandler(Filters.text,
                                    check_user_input)],
             ENTER_NAME: [MessageHandler(Filters.text,
-                            name_handler)],
-            AWAIT_IMAGE: [MessageHandler(Filters.photo, image_handler), CommandHandler('skip', skip_photo)]
+                            name_handler, pass_user_data=True)],
+            AWAIT_IMAGE: [MessageHandler(Filters.photo, image_handler, pass_user_data=True), CommandHandler("publish", publish_handler)],
         },
         fallbacks=[CommandHandler('cancel', cancel)]
     )

@@ -75,9 +75,6 @@ def removeBG(file):
     # save to disk
     cv2.imwrite(path, img_a * 255)
 
-    # Get path of output file.
-    # Assume cropped file is in current directory
-    path = './' + 'out.png'
     return path
 
 
