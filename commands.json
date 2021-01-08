@@ -56,6 +56,15 @@
     },
     "nextAction": {
       "Text": "Anything else for Stitch?\n"
+    },
+    "cancel": {
+      "Text" : "Stitch stop whatever? Okay. Stitch stop whatever.\n"
+    },
+    "skip": {
+      "Text": "Stitch go next? Okay. Stitch go next.\n"
+    },
+    "askAgain": {
+      "Text": "Stitch no understand? Try again.\n"
     }
   }
 }

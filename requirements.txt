@@ -1,2 +1,5 @@
 ###### Requirements without Version Specifiers ######`
 python-telegram-bot
+opencv-python
+numpy
+Pillow
