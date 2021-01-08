@@ -1,10 +1,67 @@
 {
   "Commands": {
     "Start": {
-      "Text": "This is the start command"
+      "Text": "Aloha! My name Stitch. What are we doing today?\n"
     },
     "Help": {
-      "Text": "This is the help command"
+      "Text": "Aloha! My name Stitch, I am a bot who can help you make your telegram stickers easily!\n"
+    },
+    "newStickerPack": {
+      "namePack": {
+        "Text": "What would you like to name it?\n"
+      },
+      "nameError": {
+        "Text": "Name is not valid. Give Stitch another name!\n"
+      },
+      "nameConfirmation": {
+        "Text": "Stitched named it {}.\n"
+      },
+      "addSticker": {
+        "Text": "Feed Stitch pictures for stickers!\n"
+      },
+      "photoError": {
+        "Text": "Photo is not valid. Give Stitch another photo!\n"
+      },
+      "createSticker": {
+        "Text": "Stitch made this, you like?\n"
+      },
+      "remakeSticker": {
+        "Text": "Okay, let Stitch try again...\n"
+      },
+      "finalizeSticker": {
+        "Text": "Stitch happy! Stitch now need an emoji for the sticker.\n"
+      },
+      "nextSticker": {
+        "Text": "Okay, feed Stitch another picture!\n"
+      },
+      "finalizePack": {
+        "Text": "No more pictures for Stitch?\n"
+      },
+      "createPack": {
+        "Text": "Okay, Stitch done.\n"
+      }
+    },
+    "showPack": {
+      "Text": "Stitch sees these: \n"
+    },
+    "editPack": {
+      "Text": "Which pack do you want to edit?\n"
+    },
+    "delete": {
+      "confirmDelete": {
+        "Text": "Stitch help you trash it?\n"
+      },
+      "removePackNotif": {
+        "Text": "Okay, Stitch removed {}.\n"
+      },
+      "removeStickerNotif": {
+        "Text": "Okay, Stitch removed {same emoji?} from {}.\n"
+      }
+    },
+    "nextAction": {
+      "Text": "Anything else for Stitch?\n"
+    }
+  }
     }
   }
 }
