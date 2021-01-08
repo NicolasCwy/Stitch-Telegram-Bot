@@ -56,11 +56,11 @@ def help_handler(update, context):
     for i in commands:
         # Uncapitalise JSON keys to be outputted
         text += "/{}\n".format(i.lower())
-    keyboard = [[InlineKeyboardButton(text='Testing1', callback_data='1'),
+    keyboard = [InlineKeyboardButton(text='Testing1', callback_data='1'),
                  InlineKeyboardButton(text='Testing2', callback_data='2'),
                  InlineKeyboardButton(text='Testing3', callback_data='3'),
-                 InlineKeyboardButton(text='Testing3', callback_data='4')]]
-    reply_markup= telegram.InlineKeyboardMarkup(keyboard)
+                 InlineKeyboardButton(text='Testing3', callback_data='4')]
+    reply_markup= telegram.InlineKeyboardMarkup.from_column(keyboard)
     update.message.reply_text("These are the commands supported by the bot", reply_markup=reply_markup)
 
 
