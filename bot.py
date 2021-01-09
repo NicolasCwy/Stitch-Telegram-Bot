@@ -128,6 +128,8 @@ def check_user_input(update, context):
     if "Create" in user_input:
         update.message.reply_text(data['Commands']['namePack']['Text'])
         return ENTER_NAME
+    elif "Cancel" in user_input:
+        update.message.reply_text(data['Commands']['exit']['Text'])
     else:
         # ask again
         reply_keyboard = [['Create'],['Cancel']]

@@ -4,7 +4,7 @@
       "Text": "Aloha! My name Stitch. What are we doing today?\n"
     },
     "Help": {
-      "Text": "Aloha! My name Stitch, I am a bot who can help you make your telegram stickers easily!\nUse the commands below to start:\n"
+      "Text": "Aloha! My name Stitch, I am a bot who can help you make your Telegram stickers easily!\nUse the commands below to start:\n"
     },
     "namePack": {
         "Text": "What would you like to name it?\n"
@@ -65,6 +65,9 @@
     },
     "askAgain": {
       "Text": "Stitch no understand? Try again.\n"
+    },
+    "exit": {
+      "Text": "Thanks for hanging out with Stitch!"
     }
   }
 }
