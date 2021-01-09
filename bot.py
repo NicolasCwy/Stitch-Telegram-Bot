@@ -2,7 +2,6 @@ import logging
 import os
 import sys
 import json
-import re
 import hashlib
 
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler, Handler
@@ -78,9 +77,10 @@ def image_handler(update, context):
     # update.message.reply_photo(stickerImg)
 
     # create/add to sticker pack and return sticker
+    packname = context.user_data['name']
     username = update.message.from_user['username']
     hash = hashlib.sha1(bytearray(update.effective_user.id)).hexdigest()
-    sticker_set_name = 'Stitched_%s_by_stichers_bot' % hash[:10]
+    sticker_set_name = "Stitched_{}_by_stichers_bot".format(hash[:10] + packname[:3])
 
     #TODO get emoji from user
 
@@ -91,9 +91,13 @@ def image_handler(update, context):
                                     png_sticker=open("img/r_{}.png".format(file.file_unique_id), 'rb'))
     except Exception:
         context.bot.createNewStickerSet(user_id=update.message.from_user.id, name=sticker_set_name,
-            title=context.user_data['name'], emojis='😄', png_sticker=open("img/r_{}.png".format(file.file_unique_id), 'rb'))
+            title=packname, emojis='😄', png_sticker=open("img/r_{}.png".format(file.file_unique_id), 'rb'))
     finally:
         update.message.reply_text(data['Commands']['nextSticker']['Text'])
+
+        stickerImg.close()
+        os.remove('img/{}.jpg'.format(file.file_unique_id))
+        os.remove("img/r_{}.png".format(file.file_unique_id))
         return AWAIT_IMAGE
 
 
