@@ -59,10 +59,7 @@ def start_handler(update, context):
 def help_handler(update, context):
     # Create a handler-function /help command
     commands = data['Commands'].keys()
-    text = ""
-    for i in commands:
-        # Uncapitalise JSON keys to be outputted
-        text += "/{}\n".format(i.lower())
+    text = "/start"
     update.message.reply_text(data['Commands']['Help']['Text'] + "{}".format(text))
 
 
@@ -71,6 +68,7 @@ def image_handler(update, context):
     file.download('img/{}.jpg'.format(file.file_unique_id))
     try:
         processImg('img/{}.jpg'.format(file.file_unique_id))
+        context.bot.send_chat_action(chat_id=update.message.chat_id, action="typing")
     except Exception:
         update.message.reply_text(data['Commands']['photoError']['Text'])
         return ENTRY
@@ -104,7 +102,6 @@ def validate_pack_name(name):
 
 def name_handler(update, context):
     pack_name = update.message.text
-    logger.info("I'm at ENTER_NAME")
     update.message.reply_text(data['Commands']['nameConfirmation']['Text'] + "{}".format(pack_name))
     context.user_data['name'] = pack_name
     if validate_pack_name(pack_name):
@@ -120,7 +117,6 @@ def publish_handler(update, context):
 
 def cancel(update, context):
     update.message.reply_text(data['Commands']['cancel']['Text'])
-    return ENTRY
 
 def check_user_input(update, context):
     user_input = update.message.text
@@ -157,6 +153,7 @@ if __name__ == '__main__':
         fallbacks=[CommandHandler('cancel', cancel)]
     )
     dispatcher.add_handler(conv_handler)
+    dispatcher.add_handler(CommandHandler("start", start_handler))
     dispatcher.add_handler(CommandHandler("help", help_handler))
 
     run(updater)

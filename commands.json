@@ -7,13 +7,13 @@
       "Text": "Aloha! My name Stitch, I am a bot who can help you make your Telegram stickers easily!\nUse the commands below to start:\n"
     },
     "namePack": {
-        "Text": "What would you like to name it?\n"
+        "Text": "What would you like to name your sticker pack?\n"
     },
     "nameError": {
       "Text": "Name not valid. Name needs to have 1 - 64 characters. Give Stitch another name!\n"
     },
     "nameConfirmation": {
-      "Text": "Stitched named it "
+      "Text": "Stitch named it "
     },
     "newPackAddSticker": {
       "Text": "Feed Stitch pictures for stickers!\n"
